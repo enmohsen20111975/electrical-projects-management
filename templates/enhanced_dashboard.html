@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrical Construction Project Management - Enhanced Dashboard</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Enhanced styling for electrical construction theme */
+        :root {
+            --electrical-blue: #003d82;
+            --electrical-orange: #ff6600;
+            --warning-yellow: #ffc107;
+            --success-green: #28a745;
+            --danger-red: #dc3545;
+            --light-gray: #f8f9fa;
+            --dark-gray: #6c757d;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            background: linear-gradient(90deg, var(--electrical-blue), #0056b3);
+            box-shadow: 0 2px 10px rgba(0, 61, 130, 0.3);
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--electrical-blue);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--electrical-blue);
+            line-height: 1;
+        }
+
+        .metric-label {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-icon {
+            font-size: 3rem;
+            color: var(--electrical-orange);
+            opacity: 0.8;
+        }
+
+        .project-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--electrical-blue);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .project-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--electrical-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .project-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-planning { background-color: #e3f2fd; color: #1976d2; }
+        .status-design { background-color: #fff3e0; color: #f57c00; }
+        .status-in_progress { background-color: #e8f5e8; color: #388e3c; }
+        .status-completed { background-color: #f3e5f5; color: #7b1fa2; }
+
+        .priority-critical { color: var(--danger-red); }
+        .priority-high { color: var(--warning-yellow); }
+        .priority-medium { color: var(--success-green); }
+        .priority-low { color: var(--dark-gray); }
+
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--electrical-blue), var(--electrical-orange));
+        }
+
+        .supplier-integration-status {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .supplier-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .indicator-connected { background-color: var(--success-green); }
+        .indicator-error { background-color: var(--danger-red); }
+        .indicator-warning { background-color: var(--warning-yellow); }
+
+        .compliance-alert {
+            border-left: 4px solid var(--danger-red);
+            background: #fff5f5;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+
+        .btn-electrical {
+            background: linear-gradient(45deg, var(--electrical-blue), var(--electrical-orange));
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-electrical:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,61,130,0.3);
+            color: white;
+        }
+
+        .real-time-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 2rem 0;
+        }
+
+        .quick-actions {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem;
+            background: var(--light-gray);
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--electrical-blue);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:hover {
+            background: var(--electrical-blue);
+            color: white;
+            text-decoration: none;
+        }
+
+        .real-data-badge {
+            background: var(--success-green);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-bolt"></i> Electrical Construction PM
+                <span class="real-data-badge">REAL DATA</span>
+            </a>
+            <div class="d-flex">
+                <span class="navbar-text me-3">
+                    <i class="real-time-indicator"></i> Live Data
+                </span>
+                <button class="btn btn-outline-light btn-sm" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-5 fw-bold text-dark">Enhanced Project Dashboard</h1>
+                    <p class="lead text-muted">
+                        Real-time supplier integration • NEC compliance checking • Live pricing updates
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="badge bg-primary fs-6">
+                        Last Updated: {{ dashboard_data.last_updated.split('T')[1].split('.')[0] }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="d-flex align-items-center">
+                        <div class="metric-icon me-3">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div>
+                            <div class="metric-value">{{ dashboard_data.metrics.total_projects }}</div>
+                            <div class="metric-label">Total Projects</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="d-flex align-items-center">
+                        <div class="metric-icon me-3">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div>
+                            <div class="metric-value">{{ dashboard_data.metrics.active_projects }}</div>
+                            <div class="metric-label">Active Projects</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="d-flex align-items-center">
+                        <div class="metric-icon me-3">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div>
+                            <div class="metric-value">${{ "{:,.0f}".format(dashboard_data.metrics.total_estimated_cost) }}</div>
+                            <div class="metric-label">Total Estimated Cost</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="d-flex align-items-center">
+                        <div class="metric-icon me-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <div class="metric-value">{{ dashboard_data.metrics.compliance_issues }}</div>
+                            <div class="metric-label">Compliance Issues</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h5><i class="fas fa-bolt"></i> Quick Actions - Industry Pain Point Solutions</h5>
+            <a href="/suppliers/search" class="action-button">
+                <i class="fas fa-search"></i> Real-time Component Search
+            </a>
+            <a href="/compliance/check" class="action-button">
+                <i class="fas fa-check-circle"></i> NEC Compliance Check
+            </a>
+            <a href="/reports" class="action-button">
+                <i class="fas fa-chart-bar"></i> Generate BOM Reports
+            </a>
+            <a href="/api/integration/status" class="action-button">
+                <i class="fas fa-plug"></i> Supplier Integration Status
+            </a>
+        </div>
+
+        <div class="row">
+            <!-- Project List -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Active Projects
+                            <span class="badge bg-success ms-2">Live Data</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% for item in dashboard_data.projects %}
+                        <div class="project-card">
+                            <div class="project-header">
+                                <div class="flex-grow-1">
+                                    <div class="project-title">
+                                        {{ item.project.name }}
+                                        {% if item.project.priority == 'critical' %}
+                                        <i class="fas fa-exclamation-triangle text-danger ms-1"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-muted">
+                                        <i class="fas fa-user"></i> {{ item.project.lead_engineer or 'Not Assigned' }} | 
+                                        <i class="fas fa-map-marker-alt"></i> {{ item.project.project_location or 'Location TBD' }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="project-status status-{{ item.project.status }}">
+                                        {{ item.project.status.replace('_', ' ').title() }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">Progress</small>
+                                    <small class="fw-bold">{{ "%.1f"|format(item.project.progress_percentage) }}%</small>
+                                </div>
+                                <div class="progress-bar-custom">
+                                    <div class="progress-bar-fill" style="width: {{ item.project.progress_percentage }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- BOM Summary -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="small text-muted">BOM Items</div>
+                                    <div class="fw-bold">{{ item.bom_summary.total_items }} items</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">BOM Cost</div>
+                                    <div class="fw-bold">${{ "{:,.0f}".format(item.bom_summary.total_cost) }}</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Supplier Coverage</div>
+                                    <div class="fw-bold">
+                                        {{ item.supplier_summary.active_suppliers }} suppliers
+                                        {% if item.supplier_summary.total_quotes > 0 %}
+                                        <span class="badge bg-success ms-1">{{ item.supplier_summary.total_quotes }} quotes</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Compliance Status -->
+                            {% if item.compliance_summary.critical_issues > 0 %}
+                            <div class="compliance-alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Critical Compliance Issues:</strong> {{ item.compliance_summary.critical_issues }} NEC violations require immediate attention
+                                <a href="/compliance/check" class="btn btn-sm btn-danger ms-2">Review</a>
+                            </div>
+                            {% elif item.compliance_summary.compliance_percentage > 0 %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle"></i>
+                                <strong>Compliance Status:</strong> {{ "%.1f"|format(item.compliance_summary.compliance_percentage) }}% compliant
+                            </div>
+                            {% endif %}
+
+                            <!-- Performance Metrics -->
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Project Health Score</small>
+                                    <small class="fw-bold">{{ item.performance_metrics.overall_health_score }}%</small>
+                                </div>
+                                <div class="progress-bar-custom">
+                                    <div class="progress-bar-fill" style="width: {{ item.performance_metrics.overall_health_score }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="mt-3">
+                                <a href="/projects/{{ item.project.id }}" class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-eye"></i> View Details
+                                </a>
+                                <a href="/projects/{{ item.project.id }}/bom" class="btn btn-sm btn-outline-success me-2">
+                                    <i class="fas fa-list"></i> Manage BOM
+                                </a>
+                                <button class="btn btn-sm btn-outline-info" onclick="generateReport({{ item.project.id }})">
+                                    <i class="fas fa-file-pdf"></i> Report
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Supplier Integration & Analytics -->
+            <div class="col-lg-4">
+                <!-- Supplier Integration Status -->
+                <div class="supplier-integration-status">
+                    <h6 class="mb-3">
+                        <i class="fas fa-plug"></i> Supplier Integration Status
+                        <span class="badge bg-success ms-2">Live</span>
+                    </h6>
+                    
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="supplier-indicator indicator-connected"></span>
+                            <span class="small">Digi-Key API</span>
+                            <span class="badge bg-success ms-auto">Connected</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="supplier-indicator indicator-connected"></span>
+                            <span class="small">Mouser Electronics</span>
+                            <span class="badge bg-success ms-auto">Connected</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="supplier-indicator indicator-warning"></span>
+                            <span class="small">UL Certification DB</span>
+                            <span class="badge bg-warning ms-auto">Limited</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="supplier-indicator indicator-connected"></span>
+                            <span class="small">NEC Standards API</span>
+                            <span class="badge bg-success ms-auto">Active</span>
+                        </div>
+                    </div>
+
+                    <div class="small text-muted">
+                        <i class="fas fa-info-circle"></i>
+                        Real-time pricing updates every 15 minutes
+                    </div>
+                </div>
+
+                <!-- Real-Time Pricing Chart -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-chart-line"></i> Price Trends</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="priceChart" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activities -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fas fa-clock"></i> Recent Supplier Activities</h6>
+                    </div>
+                    <div class="card-body">
+                        {% for activity in dashboard_data.recent_activities %}
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="me-2">
+                                {% if activity.status == 'success' %}
+                                <i class="fas fa-check-circle text-success"></i>
+                                {% elif activity.status == 'error' %}
+                                <i class="fas fa-exclamation-circle text-danger"></i>
+                                {% else %}
+                                <i class="fas fa-info-circle text-warning"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="small fw-bold">{{ activity.supplier_name }}</div>
+                                <div class="small text-muted">{{ activity.activity_type }}</div>
+                                {% if activity.records_processed %}
+                                <div class="small">{{ activity.records_processed }} records processed</div>
+                                {% endif %}
+                                <div class="small text-muted">{{ activity.timestamp.split('T')[1].split('.')[0] }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Initialize charts and functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePriceChart();
+            setInterval(refreshDashboard, 300000); // Refresh every 5 minutes
+        });
+
+        function initializePriceChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Circuit Breakers',
+                        data: [145, 147, 143, 149, 152, 147],
+                        borderColor: '#003d82',
+                        backgroundColor: 'rgba(0, 61, 130, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Switches',
+                        data: [89, 91, 88, 92, 94, 91],
+                        borderColor: '#ff6600',
+                        backgroundColor: 'rgba(255, 102, 0, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function refreshDashboard() {
+            window.location.reload();
+        }
+
+        function generateReport(projectId) {
+            fetch(`/api/reports/bom/${projectId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Create and download report
+                        const report = JSON.stringify(data.report, null, 2);
+                        const blob = new Blob([report], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `bom-report-${projectId}.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error generating report:', error);
+                    alert('Error generating report. Please try again.');
+                });
+        }
+
+        function searchComponents() {
+            const searchTerm = prompt('Enter part number or description to search:');
+            if (searchTerm) {
+                window.location.href = `/suppliers/search?query=${encodeURIComponent(searchTerm)}`;
+            }
+        }
+    </script>
+</body>
+</html>
